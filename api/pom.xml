@@ -5,16 +5,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.epam.esm</groupId>
-  <artifactId>SpringWeb</artifactId>
+  <artifactId>api</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <modules>
-    <module>api</module>
-    <module>service</module>
-      <module>repository</module>
-  </modules>
-  <packaging>pom</packaging>
+  <packaging>war</packaging>
 
-  <name>SpringWeb Maven Webapp</name>
+  <name>api Maven Webapp</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
 
@@ -27,6 +22,13 @@
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
     <dependency>
       <groupId>org.springframework</groupId>
@@ -70,10 +72,23 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>com.epam.esm</groupId>
+      <artifactId>service</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.epam.esm</groupId>
+      <artifactId>repository</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 
   <build>
-    <finalName>SpringWeb</finalName>
+    <finalName>api</finalName>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
       <plugins>
         <plugin>
