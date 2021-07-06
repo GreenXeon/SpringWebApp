@@ -9,7 +9,7 @@ public interface TagDAO {
 
     List<Tag> getAllTags();
 
-    Tag getTagByName();
+    Tag getTagByName(String name);
 
     void delete(int id);
 }
