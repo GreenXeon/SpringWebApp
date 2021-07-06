@@ -10,14 +10,13 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import javax.sql.DataSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TagDAOImplTest {
 
     private static TagDAO tagDAO;
 
     private final Tag tag = new Tag.Builder()
-            .withId(1L)
             .withName("Sample name")
             .build();
 
@@ -35,5 +34,28 @@ class TagDAOImplTest {
     @Test
     void getAllTags() {
         assertEquals(tagDAO.getAllTags().size(), 3);
+    }
+
+    @Test
+    void getTagByName() {
+        assertEquals(tagDAO.getTagByName("mjc").getName(), "mjc");
+        assertNull(tagDAO.getTagByName("not existing name"));
+    }
+
+    @Test
+    void delete() { // TODO: logging
+        assertEquals(tagDAO.getAllTags().size(), 3);
+        System.out.println(tagDAO.getAllTags());
+        tagDAO.delete(1);
+        assertEquals(tagDAO.getAllTags().size(), 2);
+        System.out.println(tagDAO.getAllTags());
+    }
+
+    @Test
+    void create() {
+        int oldSize = tagDAO.getAllTags().size();
+        tagDAO.create(tag);
+        int newSize = tagDAO.getAllTags().size();
+        assertEquals(newSize, ++oldSize);
     }
 }
