@@ -11,5 +11,5 @@ public interface TagDAO {
 
     Tag getTagByName(String name);
 
-    void delete(int id);
+    void delete(Long id);
 }

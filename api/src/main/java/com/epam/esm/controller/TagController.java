@@ -2,12 +2,12 @@ package com.epam.esm.controller;
 
 import com.epam.esm.entity.Tag;
 import com.epam.esm.service.TagService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.List;
@@ -17,6 +17,8 @@ import java.util.List;
 @RequestMapping(value = "/tag", produces = "application/json")
 public class TagController {
 
+    private final Logger logger = LogManager.getLogger(TagController.class);
+
     private final TagService tagService;
 
     @Autowired
@@ -24,9 +26,26 @@ public class TagController {
         this.tagService = tagService;
     }
 
-    @GetMapping("/sample")
-    public ResponseEntity<List<Tag>> saySample()
+    @GetMapping
+    public ResponseEntity<List<Tag>> showAllTags()
     {
+        logger.error("test message");
         return new ResponseEntity<>(tagService.getAllTags(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{name}")
+    public ResponseEntity<Tag> findById(@PathVariable String name){
+        return new ResponseEntity<>(tagService.getTagByName(name), HttpStatus.OK);
+    }
+
+    @PostMapping
+    public ResponseEntity<Tag> createTag(@RequestBody Tag tag){
+        tagService.create(tag);
+        return new ResponseEntity<>(tag, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteTag(@PathVariable Long id){
+        tagService.delete(id);
     }
 }

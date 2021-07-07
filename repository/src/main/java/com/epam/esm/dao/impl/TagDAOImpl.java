@@ -42,7 +42,7 @@ public class TagDAOImpl implements TagDAO {
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(Long id) {
         jdbcTemplate.update(DELETE_TAG_BY_ID, id);
     }
 }

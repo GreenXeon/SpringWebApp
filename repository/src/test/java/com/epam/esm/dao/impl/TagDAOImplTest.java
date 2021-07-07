@@ -46,7 +46,7 @@ class TagDAOImplTest {
     void delete() { // TODO: logging
         assertEquals(tagDAO.getAllTags().size(), 3);
         System.out.println(tagDAO.getAllTags());
-        tagDAO.delete(1);
+        tagDAO.delete(1L);
         assertEquals(tagDAO.getAllTags().size(), 2);
         System.out.println(tagDAO.getAllTags());
     }

@@ -18,7 +18,23 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    public Tag create(Tag tag) {
+        return tagDAO.create(tag);
+    }
+
+    @Override
     public List<Tag> getAllTags() {
         return tagDAO.getAllTags();
     }
+
+    @Override
+    public Tag getTagByName(String name) {
+        return tagDAO.getTagByName(name);
+    }
+
+    @Override
+    public void delete(Long id) {
+        tagDAO.delete(id);
+    }
+
 }
