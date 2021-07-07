@@ -96,6 +96,15 @@ public class GiftCertificate {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "GiftCertificate{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", createDate=" + createDate +
+                '}';
+    }
+
     public static class Builder{
         private GiftCertificate giftCertificate;
 

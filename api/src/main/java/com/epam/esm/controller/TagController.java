@@ -41,7 +41,7 @@ public class TagController {
     @PostMapping
     public ResponseEntity<Tag> createTag(@RequestBody Tag tag){
         tagService.create(tag);
-        return new ResponseEntity<>(tag, HttpStatus.OK);
+        return new ResponseEntity<>(tag, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")

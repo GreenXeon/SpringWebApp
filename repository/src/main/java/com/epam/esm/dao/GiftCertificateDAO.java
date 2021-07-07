@@ -9,9 +9,11 @@ public interface GiftCertificateDAO {
 
     List<GiftCertificate> getAllCertificates();
 
+    GiftCertificate getCertificateById(Long id);
+
     GiftCertificate getCertificateByTagName(String tagName);
 
-    GiftCertificate update(int id, GiftCertificate newCertificate);
+    GiftCertificate update(Long id, GiftCertificate newCertificate);
 
-    void delete(int id);
+    void delete(Long id);
 }
