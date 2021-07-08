@@ -40,10 +40,10 @@ CREATE TABLE IF NOT EXISTS `springDB`.`gift_certificate_has_tag` (
   PRIMARY KEY (`gift_certificate_id`, `tag_id`),
     FOREIGN KEY (`gift_certificate_id`)
     REFERENCES `springDB`.`gift_certificate` (`id`)
-    ON DELETE NO ACTION
+    ON DELETE CASCADE
     ON UPDATE NO ACTION,
     FOREIGN KEY (`tag_id`)
     REFERENCES `springDB`.`tag` (`id`)
-    ON DELETE NO ACTION
+    ON DELETE CASCADE
     ON UPDATE NO ACTION)
 

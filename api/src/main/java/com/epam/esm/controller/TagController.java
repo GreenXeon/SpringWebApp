@@ -29,7 +29,6 @@ public class TagController {
     @GetMapping
     public ResponseEntity<List<Tag>> showAllTags()
     {
-        logger.error("test message");
         return new ResponseEntity<>(tagService.getAllTags(), HttpStatus.OK);
     }
 

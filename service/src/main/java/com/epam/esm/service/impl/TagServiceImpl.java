@@ -36,5 +36,4 @@ public class TagServiceImpl implements TagService {
     public void delete(Long id) {
         tagDAO.delete(id);
     }
-
 }

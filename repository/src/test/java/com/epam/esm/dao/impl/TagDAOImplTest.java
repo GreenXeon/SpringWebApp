@@ -2,8 +2,7 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.TagDAO;
 import com.epam.esm.entity.Tag;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -12,6 +11,7 @@ import javax.sql.DataSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class TagDAOImplTest {
 
     private static TagDAO tagDAO;
@@ -32,26 +32,28 @@ class TagDAOImplTest {
     }
 
     @Test
+    @Order(1)
     void getAllTags() {
         assertEquals(tagDAO.getAllTags().size(), 3);
     }
 
     @Test
+    @Order(3)
     void getTagByName() {
         assertEquals(tagDAO.getTagByName("mjc").getName(), "mjc");
         assertNull(tagDAO.getTagByName("not existing name"));
     }
 
     @Test
-    void delete() { // TODO: logging
+    @Order(2)
+    void delete() {
         assertEquals(tagDAO.getAllTags().size(), 3);
-        System.out.println(tagDAO.getAllTags());
         tagDAO.delete(1L);
         assertEquals(tagDAO.getAllTags().size(), 2);
-        System.out.println(tagDAO.getAllTags());
     }
 
     @Test
+    @Order(4)
     void create() {
         int oldSize = tagDAO.getAllTags().size();
         tagDAO.create(tag);

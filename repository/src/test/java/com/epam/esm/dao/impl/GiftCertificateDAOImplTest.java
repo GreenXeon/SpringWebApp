@@ -4,6 +4,7 @@ import com.epam.esm.dao.GiftCertificateDAO;
 import com.epam.esm.entity.GiftCertificate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -45,19 +46,19 @@ class GiftCertificateDAOImplTest {
     @Test
     void create() {
         int oldSize = giftCertificateDAO.getAllCertificates().size();
-        assertNotEquals(giftCertificateDAO.create(giftCertificate), null);
+        assertNotNull(giftCertificateDAO.create(giftCertificate));
         int newSize = giftCertificateDAO.getAllCertificates().size();
         assertEquals(newSize, oldSize + 1);
     }
 
     @Test
     void getAllCertificates() {
-        assertEquals(giftCertificateDAO.getAllCertificates().size(), 3);
+        assertTrue(giftCertificateDAO.getAllCertificates().size() > 1);
     }
 
     @Test
     void getCertificateByTagName() {
-        assertEquals(giftCertificateDAO.getCertificateByTagName("mjc").getId(), 1L);
+        assertNotNull(giftCertificateDAO.getCertificateByTagName("mjc"));
         assertNull(giftCertificateDAO.getCertificateByTagName("notexists"));
     }
 
@@ -69,11 +70,19 @@ class GiftCertificateDAOImplTest {
 
     @Test
     void delete() {
+        int oldSize = giftCertificateDAO.getAllCertificates().size();
+        long id = 2L;
+        giftCertificateDAO.delete(id);
+        int newSize = giftCertificateDAO.getAllCertificates().size();
+        assertEquals(newSize, oldSize - 1);
+
     }
 
     @Test
     void getCertificateById() {
-        assertNotNull(giftCertificateDAO.getCertificateById(1L));
-        assertEquals(giftCertificateDAO.getCertificateById(1L).getName(), "first");
+        long id = 1L;
+        GiftCertificate giftCertificate = giftCertificateDAO.getCertificateById(id);
+        assertNotNull(giftCertificate);
+        assertEquals(giftCertificate.getName(), "first");
     }
 }
