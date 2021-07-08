@@ -2,6 +2,9 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.TagDAO;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.DaoCreateException;
+import com.epam.esm.exception.DaoDeleteException;
+import com.epam.esm.exception.TagNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,8 +27,12 @@ public class TagDAOImpl implements TagDAO {
     }
 
     @Override
-    public Tag create(Tag tag) {
-        return jdbcTemplate.update(SAVE_TAG, tag.getName()) == 1 ? tag : null;
+    public Tag create(Tag tag) throws DaoCreateException {
+        if (jdbcTemplate.update(SAVE_TAG, tag.getName()) == 0){
+            throw new DaoCreateException("Cannot save tag with name " + tag.getName());
+        } else {
+            return tag;
+        }
     }
 
     @Override
@@ -34,15 +41,21 @@ public class TagDAOImpl implements TagDAO {
     }
 
     @Override
-    public Tag getTagByName(String name) {
-        return jdbcTemplate.query(GET_TAG_BY_NAME, new BeanPropertyRowMapper<>(Tag.class), name)
+    public Tag getTagByName(String name) throws TagNotFoundException {
+        Tag tag = jdbcTemplate.query(GET_TAG_BY_NAME, new BeanPropertyRowMapper<>(Tag.class), name)
                 .stream()
                 .findAny()
                 .orElse(null);
+        if (tag == null){
+            throw new TagNotFoundException("Tag with name " + name + " is not found");
+        }
+        return tag;
     }
 
     @Override
-    public void delete(Long id) {
-        jdbcTemplate.update(DELETE_TAG_BY_ID, id);
+    public void delete(Long id) throws DaoDeleteException {
+        if (jdbcTemplate.update(DELETE_TAG_BY_ID, id) == 0){
+            throw new DaoDeleteException("Cannot delete tag with id " + id);
+        }
     }
 }

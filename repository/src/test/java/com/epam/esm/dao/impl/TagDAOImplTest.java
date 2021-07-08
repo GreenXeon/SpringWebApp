@@ -2,7 +2,11 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.TagDAO;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.DaoCreateException;
+import com.epam.esm.exception.DaoDeleteException;
+import com.epam.esm.exception.TagNotFoundException;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -39,16 +43,17 @@ class TagDAOImplTest {
 
     @Test
     @Order(3)
-    void getTagByName() {
+    void getTagByName() throws TagNotFoundException {
         assertEquals(tagDAO.getTagByName("mjc").getName(), "mjc");
-        assertNull(tagDAO.getTagByName("not existing name"));
+        assertThrows(TagNotFoundException.class, () -> tagDAO.getTagByName("not existing name"));
+        assertDoesNotThrow(() -> tagDAO.getTagByName("hello"));
     }
 
     @Test
     @Order(2)
-    void delete() {
+    void delete() throws DaoDeleteException {
         assertEquals(tagDAO.getAllTags().size(), 3);
-        tagDAO.delete(1L);
+        assertDoesNotThrow(() -> tagDAO.delete(1L));
         assertEquals(tagDAO.getAllTags().size(), 2);
     }
 
@@ -56,7 +61,7 @@ class TagDAOImplTest {
     @Order(4)
     void create() {
         int oldSize = tagDAO.getAllTags().size();
-        tagDAO.create(tag);
+        assertDoesNotThrow(() -> tagDAO.create(tag));
         int newSize = tagDAO.getAllTags().size();
         assertEquals(newSize, ++oldSize);
     }

@@ -2,9 +2,12 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.GiftCertificateDAO;
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.exception.DaoCreateException;
+import com.epam.esm.exception.DaoDeleteException;
+import com.epam.esm.exception.DaoUpdateException;
+import com.epam.esm.exception.GiftCertificateNotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,7 +15,6 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import javax.sql.DataSource;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -44,9 +46,9 @@ class GiftCertificateDAOImplTest {
     }
 
     @Test
-    void create() {
+    void create() throws DaoCreateException {
         int oldSize = giftCertificateDAO.getAllCertificates().size();
-        assertNotNull(giftCertificateDAO.create(giftCertificate));
+        assertDoesNotThrow(() -> giftCertificateDAO.create(giftCertificate));
         int newSize = giftCertificateDAO.getAllCertificates().size();
         assertEquals(newSize, oldSize + 1);
     }
@@ -57,32 +59,33 @@ class GiftCertificateDAOImplTest {
     }
 
     @Test
-    void getCertificateByTagName() {
-        assertNotNull(giftCertificateDAO.getCertificateByTagName("mjc"));
-        assertNull(giftCertificateDAO.getCertificateByTagName("notexists"));
+    void getCertificateByTagName(){
+        assertDoesNotThrow(() -> giftCertificateDAO.getCertificateByTagName("mjc"));
+        assertThrows(GiftCertificateNotFoundException.class, () -> giftCertificateDAO.getCertificateByTagName("notexists"));
     }
 
     @Test
-    void update() {
+    void update() throws DaoUpdateException {
         long id = 1L;
-        assertNotNull(giftCertificateDAO.update(id, giftCertificate));
+        assertDoesNotThrow(() -> giftCertificateDAO.update(id, giftCertificate));
     }
 
     @Test
-    void delete() {
+    void delete() throws DaoDeleteException {
         int oldSize = giftCertificateDAO.getAllCertificates().size();
         long id = 2L;
-        giftCertificateDAO.delete(id);
+        assertDoesNotThrow(() -> giftCertificateDAO.delete(id));
         int newSize = giftCertificateDAO.getAllCertificates().size();
         assertEquals(newSize, oldSize - 1);
 
     }
 
     @Test
-    void getCertificateById() {
-        long id = 1L;
-        GiftCertificate giftCertificate = giftCertificateDAO.getCertificateById(id);
-        assertNotNull(giftCertificate);
-        assertEquals(giftCertificate.getName(), "first");
+    void getCertificateById() throws GiftCertificateNotFoundException {
+        long realId = 1L;
+        long fakeId = 1000L;
+        assertDoesNotThrow(() -> giftCertificateDAO.getCertificateById(realId));
+        assertThrows(GiftCertificateNotFoundException.class, () -> giftCertificateDAO.getCertificateById(fakeId));
+        assertEquals(giftCertificateDAO.getCertificateById(realId).getName(), "first");
     }
 }

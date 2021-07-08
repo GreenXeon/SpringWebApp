@@ -2,6 +2,10 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.GiftCertificateDAO;
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.exception.DaoCreateException;
+import com.epam.esm.exception.DaoDeleteException;
+import com.epam.esm.exception.DaoUpdateException;
+import com.epam.esm.exception.GiftCertificateNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,16 +34,17 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
     }
 
     @Override
-    public GiftCertificate create(GiftCertificate giftCertificate) {
-        return jdbcTemplate.update(SAVE_CERTIFICATE,
+    public GiftCertificate create(GiftCertificate giftCertificate) throws DaoCreateException {
+        if (jdbcTemplate.update(SAVE_CERTIFICATE,
                 giftCertificate.getName(),
                 giftCertificate.getDescription(),
                 giftCertificate.getPrice(),
                 giftCertificate.getDuration(),
                 giftCertificate.getCreateDate(),
-                giftCertificate.getLastUpdateDate()) == 1
-                ? giftCertificate
-                : null;
+                giftCertificate.getLastUpdateDate()) == 0){
+            throw new DaoCreateException("Cannot create certificate with name " + giftCertificate.getName());
+        }
+            return giftCertificate;
     }
 
     @Override
@@ -48,37 +53,50 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
     }
 
     @Override
-    public GiftCertificate getCertificateById(Long id) {
-        return jdbcTemplate.query(GET_CERTIFICATE_BY_ID, new BeanPropertyRowMapper<>(GiftCertificate.class), id)
+    public GiftCertificate getCertificateById(Long id) throws GiftCertificateNotFoundException {
+        GiftCertificate giftCertificate = jdbcTemplate.query(GET_CERTIFICATE_BY_ID,
+                new BeanPropertyRowMapper<>(GiftCertificate.class), id)
                 .stream()
                 .findAny()
                 .orElse(null);
+        if (giftCertificate == null){
+            throw new GiftCertificateNotFoundException("Cannot find certificate with id " + id);
+        }
+        return giftCertificate;
     }
 
     @Override
-    public GiftCertificate getCertificateByTagName(String tagName) {
-        return jdbcTemplate.query(GET_CERTIFICATE_WITH_TAG, new BeanPropertyRowMapper<>(GiftCertificate.class), tagName)
+    public GiftCertificate getCertificateByTagName(String tagName) throws GiftCertificateNotFoundException {
+        GiftCertificate giftCertificate = jdbcTemplate.query(GET_CERTIFICATE_WITH_TAG,
+                new BeanPropertyRowMapper<>(GiftCertificate.class), tagName)
                 .stream()
                 .findAny()
                 .orElse(null);
+        if (giftCertificate == null){
+            throw new GiftCertificateNotFoundException("Cannot find certificate with name " + tagName);
+        }
+        return giftCertificate;
     }
 
     @Override
-    public GiftCertificate update(Long id, GiftCertificate newCertificate) {
-        return jdbcTemplate.update(UPDATE_CERTIFICATE,
+    public GiftCertificate update(Long id, GiftCertificate newCertificate) throws DaoUpdateException {
+        if (jdbcTemplate.update(UPDATE_CERTIFICATE,
                 newCertificate.getName(),
                 newCertificate.getDescription(),
                 newCertificate.getPrice(),
                 newCertificate.getDuration(),
                 newCertificate.getCreateDate(),
                 newCertificate.getLastUpdateDate(),
-                id) == 1
-                ? newCertificate
-                : null;
+                id) == 0){
+            throw new DaoUpdateException("Cannot update certificate with id " + id);
+        }
+            return newCertificate;
     }
 
     @Override
-    public void delete(Long id) {
-        jdbcTemplate.update(DELETE_CERTIFICATE_BY_ID, id);
+    public void delete(Long id) throws DaoDeleteException {
+        if (jdbcTemplate.update(DELETE_CERTIFICATE_BY_ID, id) == 0){
+            throw new DaoDeleteException("Cannot delete certificate with id " + id);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.TagServiceException;
 import com.epam.esm.service.TagService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,18 +34,18 @@ public class TagController {
     }
 
     @GetMapping("/{name}")
-    public ResponseEntity<Tag> findById(@PathVariable String name){
+    public ResponseEntity<Tag> findByName(@PathVariable String name) throws TagServiceException {
         return new ResponseEntity<>(tagService.getTagByName(name), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Tag> createTag(@RequestBody Tag tag){
+    public ResponseEntity<Tag> createTag(@RequestBody Tag tag) throws TagServiceException {
         tagService.create(tag);
         return new ResponseEntity<>(tag, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTag(@PathVariable Long id){
+    public void deleteTag(@PathVariable Long id) throws TagServiceException {
         tagService.delete(id);
     }
 }

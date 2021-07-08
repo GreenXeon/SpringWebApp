@@ -2,13 +2,17 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.impl.TagDAOImpl;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.DaoCreateException;
+import com.epam.esm.exception.DaoDeleteException;
+import com.epam.esm.exception.TagNotFoundException;
+import com.epam.esm.exception.TagServiceException;
 import com.epam.esm.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Component
+@Service
 public class TagServiceImpl implements TagService {
     private final TagDAOImpl tagDAO;
 
@@ -18,8 +22,14 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Tag create(Tag tag) {
-        return tagDAO.create(tag);
+    public Tag create(Tag tag) throws TagServiceException {
+        Tag createdTag;
+        try {
+            createdTag = tagDAO.create(tag);
+        } catch (DaoCreateException e) {
+            throw new TagServiceException("Creating tag " + tag.getName() + " service error", e);
+        }
+        return createdTag;
     }
 
     @Override
@@ -28,12 +38,20 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Tag getTagByName(String name) {
-        return tagDAO.getTagByName(name);
+    public Tag getTagByName(String name) throws TagServiceException {
+        try {
+            return tagDAO.getTagByName(name);
+        } catch (TagNotFoundException e) {
+            throw new TagServiceException("Getting tag " + name + " service error", e);
+        }
     }
 
     @Override
-    public void delete(Long id) {
-        tagDAO.delete(id);
+    public void delete(Long id) throws TagServiceException {
+        try {
+            tagDAO.delete(id);
+        } catch (DaoDeleteException e) {
+            throw new TagServiceException("Deleting tag " + id + " service error", e);
+        }
     }
 }
