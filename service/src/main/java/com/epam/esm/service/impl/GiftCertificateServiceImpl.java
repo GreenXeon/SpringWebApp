@@ -1,10 +1,13 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.dao.GiftCertificateDAO;
 import com.epam.esm.dao.impl.GiftCertificateDAOImpl;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.*;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.util.ServiceUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +15,12 @@ import java.util.List;
 
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
-    private final GiftCertificateDAOImpl giftCertificateDAO;
+    private final Logger logger = LogManager.getLogger(GiftCertificateServiceImpl.class);
+
+    private final GiftCertificateDAO giftCertificateDAO;
 
     @Autowired
-    public GiftCertificateServiceImpl(GiftCertificateDAOImpl giftCertificateDAO) {
+    public GiftCertificateServiceImpl(GiftCertificateDAO giftCertificateDAO) {
         this.giftCertificateDAO = giftCertificateDAO;
     }
 
@@ -55,7 +60,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public GiftCertificate update(Long id, GiftCertificate changingCertificate) throws GiftCertificateServiceException {
         try {
             GiftCertificate newCertificate = new GiftCertificate();
-            GiftCertificate oldCertificate = this.getCertificateById(id);
+            GiftCertificate oldCertificate = getCertificateById(id);
             newCertificate.setName(changingCertificate.getName() == null ? oldCertificate.getName()
                     : changingCertificate.getName());
             newCertificate.setDescription(changingCertificate.getDescription() == null ? oldCertificate.getDescription()
@@ -67,6 +72,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             newCertificate.setCreateDate(changingCertificate.getCreateDate() == null ? oldCertificate.getCreateDate()
                     : changingCertificate.getCreateDate());
             newCertificate.setLastUpdateDate(ServiceUtils.getCurrentDateTime());
+            logger.info(newCertificate.getName());
             return giftCertificateDAO.update(id, newCertificate);
         } catch (DaoUpdateException e) {
             throw new GiftCertificateServiceException("Cannot update certificate with id " + id, e);

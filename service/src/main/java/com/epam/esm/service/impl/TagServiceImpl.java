@@ -1,5 +1,6 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.dao.TagDAO;
 import com.epam.esm.dao.impl.TagDAOImpl;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DaoCreateException;
@@ -14,10 +15,10 @@ import java.util.List;
 
 @Service
 public class TagServiceImpl implements TagService {
-    private final TagDAOImpl tagDAO;
+    private final TagDAO tagDAO;
 
     @Autowired
-    public TagServiceImpl(TagDAOImpl tagDAO) {
+    public TagServiceImpl(TagDAO tagDAO) {
         this.tagDAO = tagDAO;
     }
 
