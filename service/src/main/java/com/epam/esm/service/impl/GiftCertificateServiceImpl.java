@@ -4,6 +4,7 @@ import com.epam.esm.dao.impl.GiftCertificateDAOImpl;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.*;
 import com.epam.esm.service.GiftCertificateService;
+import com.epam.esm.util.ServiceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -65,8 +66,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                     : changingCertificate.getDuration());
             newCertificate.setCreateDate(changingCertificate.getCreateDate() == null ? oldCertificate.getCreateDate()
                     : changingCertificate.getCreateDate());
-            newCertificate.setLastUpdateDate(changingCertificate.getLastUpdateDate() == null ? oldCertificate.getLastUpdateDate()
-                    : changingCertificate.getLastUpdateDate());
+            newCertificate.setLastUpdateDate(ServiceUtils.getCurrentDateTime());
             return giftCertificateDAO.update(id, newCertificate);
         } catch (DaoUpdateException e) {
             throw new GiftCertificateServiceException("Cannot update certificate with id " + id, e);
