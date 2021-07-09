@@ -40,8 +40,8 @@ public class TagController {
 
     @PostMapping
     public ResponseEntity<Tag> createTag(@RequestBody Tag tag) throws TagServiceException {
-        tagService.create(tag);
-        return new ResponseEntity<>(tag, HttpStatus.CREATED);
+        Tag newTag = tagService.create(tag);
+        return new ResponseEntity<>(newTag, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")

@@ -27,6 +27,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Override
     public GiftCertificate create(GiftCertificate giftCertificate) throws GiftCertificateServiceException {
         try {
+            giftCertificate.setCreateDate(ServiceUtils.getCurrentDateTime());
+            giftCertificate.setLastUpdateDate(ServiceUtils.getCurrentDateTime());
             return giftCertificateDAO.create(giftCertificate);
         } catch (DaoCreateException e) {
             throw new GiftCertificateServiceException("Creating certificate " + giftCertificate.getName() + " is failed", e);
