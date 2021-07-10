@@ -4,7 +4,6 @@ import com.epam.esm.dao.TagDAO;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DaoCreateException;
 import com.epam.esm.exception.DaoDeleteException;
-import com.epam.esm.exception.TagNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,7 +14,7 @@ import java.util.List;
 @Component
 public class TagDAOImpl implements TagDAO {
     private static final String GET_ALL_TAGS = "SELECT * FROM springdb.tag";
-    private static final String GET_TAG_BY_NAME = "SELECT * FROM springdb.tag WHERE name = ?";
+    private static final String GET_TAG_BY_ID = "SELECT * FROM springdb.tag WHERE id = ?";
     private static final String SAVE_TAG = "INSERT INTO springdb.tag (name) VALUES (?)";
     private static final String DELETE_TAG_BY_ID = "DELETE FROM springdb.tag WHERE id = ?";
 
@@ -41,14 +40,11 @@ public class TagDAOImpl implements TagDAO {
     }
 
     @Override
-    public Tag getTagByName(String name) throws TagNotFoundException {
-        Tag tag = jdbcTemplate.query(GET_TAG_BY_NAME, new BeanPropertyRowMapper<>(Tag.class), name)
+    public Tag getTagById(Long id){
+        Tag tag = jdbcTemplate.query(GET_TAG_BY_ID, new BeanPropertyRowMapper<>(Tag.class), id)
                 .stream()
                 .findAny()
                 .orElse(null);
-        if (tag == null){
-            throw new TagNotFoundException("Tag with name " + name + " is not found");
-        }
         return tag;
     }
 

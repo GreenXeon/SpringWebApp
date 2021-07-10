@@ -2,10 +2,7 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.GiftCertificateDAO;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.exception.DaoCreateException;
-import com.epam.esm.exception.DaoDeleteException;
-import com.epam.esm.exception.DaoUpdateException;
-import com.epam.esm.exception.GiftCertificateNotFoundException;
+import com.epam.esm.exception.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeAll;
@@ -60,8 +57,7 @@ class GiftCertificateDAOImplTest {
 
     @Test
     void getCertificateByTagName(){
-        assertDoesNotThrow(() -> giftCertificateDAO.getCertificateByTagName("mjc"));
-        assertThrows(GiftCertificateNotFoundException.class, () -> giftCertificateDAO.getCertificateByTagName("notexists"));
+        assertEquals(giftCertificateDAO.getCertificateByTagName("mjc").getId(), 1);
     }
 
     @Test
@@ -81,11 +77,10 @@ class GiftCertificateDAOImplTest {
     }
 
     @Test
-    void getCertificateById() throws GiftCertificateNotFoundException {
+    void getCertificateById() throws DaoReadException {
         long realId = 1L;
         long fakeId = 1000L;
         assertDoesNotThrow(() -> giftCertificateDAO.getCertificateById(realId));
-        assertThrows(GiftCertificateNotFoundException.class, () -> giftCertificateDAO.getCertificateById(fakeId));
         assertEquals(giftCertificateDAO.getCertificateById(realId).getName(), "first");
     }
 }

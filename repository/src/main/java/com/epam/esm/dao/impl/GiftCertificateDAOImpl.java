@@ -2,10 +2,7 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.GiftCertificateDAO;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.exception.DaoCreateException;
-import com.epam.esm.exception.DaoDeleteException;
-import com.epam.esm.exception.DaoUpdateException;
-import com.epam.esm.exception.GiftCertificateNotFoundException;
+import com.epam.esm.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -53,28 +50,22 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
     }
 
     @Override
-    public GiftCertificate getCertificateById(Long id) throws GiftCertificateNotFoundException {
+    public GiftCertificate getCertificateById(Long id) {
         GiftCertificate giftCertificate = jdbcTemplate.query(GET_CERTIFICATE_BY_ID,
                 new BeanPropertyRowMapper<>(GiftCertificate.class), id)
                 .stream()
                 .findAny()
                 .orElse(null);
-        if (giftCertificate == null){
-            throw new GiftCertificateNotFoundException("Cannot find certificate with id " + id);
-        }
         return giftCertificate;
     }
 
     @Override
-    public GiftCertificate getCertificateByTagName(String tagName) throws GiftCertificateNotFoundException {
+    public GiftCertificate getCertificateByTagName(String tagName) {
         GiftCertificate giftCertificate = jdbcTemplate.query(GET_CERTIFICATE_WITH_TAG,
                 new BeanPropertyRowMapper<>(GiftCertificate.class), tagName)
                 .stream()
                 .findAny()
                 .orElse(null);
-        if (giftCertificate == null){
-            throw new GiftCertificateNotFoundException("Cannot find certificate with name " + tagName);
-        }
         return giftCertificate;
     }
 

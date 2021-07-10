@@ -1,6 +1,7 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.exception.GiftCertificateNotFoundException;
 import com.epam.esm.exception.GiftCertificateServiceException;
 import com.epam.esm.service.GiftCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class GiftCertificateController {
 
     @GetMapping("/{id}")
     public ResponseEntity<GiftCertificate> showCertificateById(@PathVariable Long id)
-            throws GiftCertificateServiceException {
+            throws GiftCertificateServiceException, GiftCertificateNotFoundException {
         GiftCertificate giftCertificate = giftCertificateService.getCertificateById(id);
         return new ResponseEntity<>(giftCertificate, HttpStatus.OK);
     }
@@ -38,18 +39,20 @@ public class GiftCertificateController {
     public ResponseEntity<GiftCertificate> createCertificate(@RequestBody GiftCertificate giftCertificate)
             throws GiftCertificateServiceException {
         GiftCertificate newCertificate = giftCertificateService.create(giftCertificate);
-        return new ResponseEntity<>(newCertificate, HttpStatus.OK);
+        return new ResponseEntity<>(newCertificate, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCertificate(@PathVariable Long id) throws GiftCertificateServiceException {
+    public ResponseEntity<HttpStatus> deleteCertificate(@PathVariable Long id)
+            throws GiftCertificateServiceException, GiftCertificateNotFoundException {
         giftCertificateService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<GiftCertificate> updateCertificate(@PathVariable Long id,
                                                              @RequestBody GiftCertificate giftCertificate)
-            throws GiftCertificateServiceException {
+            throws GiftCertificateServiceException, GiftCertificateNotFoundException {
         GiftCertificate newCertificate = giftCertificateService.update(id, giftCertificate);
         return new ResponseEntity<>(newCertificate, HttpStatus.OK);
     }

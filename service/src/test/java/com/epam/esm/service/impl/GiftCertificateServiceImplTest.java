@@ -58,7 +58,7 @@ class GiftCertificateServiceImplTest {
 
     @Test
     void whenMockGetsCertificateByIdThenReturnNotNullCertificate()
-            throws GiftCertificateNotFoundException, GiftCertificateServiceException {
+            throws GiftCertificateNotFoundException {
         when(giftCertificateDAO.getCertificateById(anyLong())).thenReturn(new GiftCertificate());
         GiftCertificate giftCertificate = giftCertificateService.getCertificateById(1L);
         assertNotNull(giftCertificate);
@@ -66,7 +66,7 @@ class GiftCertificateServiceImplTest {
 
     @Test
     void whenMockGetsCertificateByTagNameThenReturnCertificate()
-            throws GiftCertificateNotFoundException, GiftCertificateServiceException {
+            throws GiftCertificateNotFoundException{
         when(giftCertificateDAO.getCertificateByTagName(anyString())).thenReturn(new GiftCertificate());
         GiftCertificate giftCertificate = giftCertificateService.getCertificateByTagName("samplename");
         assertNotNull(giftCertificate);
@@ -86,7 +86,8 @@ class GiftCertificateServiceImplTest {
     }
 
     @Test
-    void whenMockDeletesTagThenReturnTrue() throws DaoDeleteException, GiftCertificateServiceException {
+    void whenMockDeletesTagThenReturnTrue() throws
+            DaoDeleteException, GiftCertificateServiceException, GiftCertificateNotFoundException {
         doNothing().when(giftCertificateDAO).delete(anyLong());
         giftCertificateService.delete(1L);
         verify(giftCertificateDAO).delete(1L);

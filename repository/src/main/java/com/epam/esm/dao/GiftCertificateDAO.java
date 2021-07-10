@@ -1,10 +1,7 @@
 package com.epam.esm.dao;
 
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.exception.DaoCreateException;
-import com.epam.esm.exception.DaoDeleteException;
-import com.epam.esm.exception.DaoUpdateException;
-import com.epam.esm.exception.GiftCertificateNotFoundException;
+import com.epam.esm.exception.*;
 
 import java.util.List;
 
@@ -13,9 +10,9 @@ public interface GiftCertificateDAO {
 
     List<GiftCertificate> getAllCertificates();
 
-    GiftCertificate getCertificateById(Long id) throws GiftCertificateNotFoundException;
+    GiftCertificate getCertificateById(Long id);
 
-    GiftCertificate getCertificateByTagName(String tagName) throws GiftCertificateNotFoundException;
+    GiftCertificate getCertificateByTagName(String tagName);
 
     GiftCertificate update(Long id, GiftCertificate newCertificate) throws DaoUpdateException;
 

@@ -24,13 +24,11 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Tag create(Tag tag) throws TagServiceException {
-        Tag createdTag;
         try {
-            createdTag = tagDAO.create(tag);
+            return tagDAO.create(tag);
         } catch (DaoCreateException e) {
             throw new TagServiceException("Creating tag " + tag.getName() + " service error", e);
         }
-        return createdTag;
     }
 
     @Override
@@ -39,17 +37,18 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Tag getTagByName(String name) throws TagServiceException {
-        try {
-            return tagDAO.getTagByName(name);
-        } catch (TagNotFoundException e) {
-            throw new TagServiceException("Getting tag " + name + " service error", e);
+    public Tag getTagById(Long id) throws TagNotFoundException {
+        Tag tag = tagDAO.getTagById(id);
+        if (tag == null){
+            throw new TagNotFoundException("Tag with id " + id + " is not found");
         }
+        return tag;
     }
 
     @Override
-    public void delete(Long id) throws TagServiceException {
+    public void delete(Long id) throws TagServiceException, TagNotFoundException {
         try {
+            getTagById(id);
             tagDAO.delete(id);
         } catch (DaoDeleteException e) {
             throw new TagServiceException("Deleting tag " + id + " service error", e);

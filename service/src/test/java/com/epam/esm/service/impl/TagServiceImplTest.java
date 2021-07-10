@@ -48,13 +48,13 @@ class TagServiceImplTest {
 
     @Test
     public void whenMockGetsTagByNameThenReturnNotNullTag() throws TagServiceException, TagNotFoundException {
-        when(tagDAO.getTagByName(anyString())).thenReturn(new Tag());
-        Tag tag = tagService.getTagByName("mjc");
+        when(tagDAO.getTagById(anyLong())).thenReturn(new Tag());
+        Tag tag = tagService.getTagById(1L);
         assertNotNull(tag);
     }
 
     @Test
-    public void whenMockDeletesTagThenReturnTrue() throws DaoDeleteException, TagServiceException {
+    public void whenMockDeletesTagThenReturnTrue() throws DaoDeleteException, TagServiceException, TagNotFoundException {
         doNothing().when(tagDAO).delete(anyLong());
         tagService.delete(1L);
         verify(tagDAO).delete(anyLong());

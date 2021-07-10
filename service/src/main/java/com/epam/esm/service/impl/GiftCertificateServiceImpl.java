@@ -31,7 +31,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             giftCertificate.setLastUpdateDate(ServiceUtils.getCurrentDateTime());
             return giftCertificateDAO.create(giftCertificate);
         } catch (DaoCreateException e) {
-            throw new GiftCertificateServiceException("Creating certificate " + giftCertificate.getName() + " is failed", e);
+            throw new GiftCertificateServiceException("Creating certificate '" + giftCertificate.getName() + "' is failed", e);
         }
     }
 
@@ -41,28 +41,30 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public GiftCertificate getCertificateById(Long id) throws GiftCertificateServiceException {
-        try {
-            return giftCertificateDAO.getCertificateById(id);
-        } catch (GiftCertificateNotFoundException e) {
-            throw new GiftCertificateServiceException("Cannot find certificate by id " + id, e);
+    public GiftCertificate getCertificateById(Long id) throws GiftCertificateNotFoundException {
+        GiftCertificate giftCertificate = giftCertificateDAO.getCertificateById(id);
+        if (giftCertificate == null){
+            throw new GiftCertificateNotFoundException("Certificate with id " + id + " is not found");
         }
+        return giftCertificate;
     }
 
     @Override
-    public GiftCertificate getCertificateByTagName(String tagName) throws GiftCertificateServiceException {
-        try {
-            return giftCertificateDAO.getCertificateByTagName(tagName);
-        } catch (GiftCertificateNotFoundException e) {
-            throw new GiftCertificateServiceException("Cannot find certificate with tag name " + tagName, e);
+    public GiftCertificate getCertificateByTagName(String tagName) throws GiftCertificateNotFoundException {
+        GiftCertificate giftCertificate = giftCertificateDAO.getCertificateByTagName(tagName);
+        if (giftCertificate == null){
+            throw new GiftCertificateNotFoundException("Certificate with tag name '" + tagName + "' is not found");
         }
+        return giftCertificate;
     }
 
     @Override
-    public GiftCertificate update(Long id, GiftCertificate changingCertificate) throws GiftCertificateServiceException {
+    public GiftCertificate update(Long id, GiftCertificate changingCertificate)
+            throws GiftCertificateServiceException, GiftCertificateNotFoundException {
         try {
             GiftCertificate newCertificate = new GiftCertificate();
             GiftCertificate oldCertificate = getCertificateById(id);
+            newCertificate.setId(oldCertificate.getId());
             newCertificate.setName(changingCertificate.getName() == null ? oldCertificate.getName()
                     : changingCertificate.getName());
             newCertificate.setDescription(changingCertificate.getDescription() == null ? oldCertificate.getDescription()
@@ -74,7 +76,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             newCertificate.setCreateDate(changingCertificate.getCreateDate() == null ? oldCertificate.getCreateDate()
                     : changingCertificate.getCreateDate());
             newCertificate.setLastUpdateDate(ServiceUtils.getCurrentDateTime());
-            logger.info(newCertificate.getName());
             return giftCertificateDAO.update(id, newCertificate);
         } catch (DaoUpdateException e) {
             throw new GiftCertificateServiceException("Cannot update certificate with id " + id, e);
@@ -82,8 +83,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public void delete(Long id) throws GiftCertificateServiceException {
+    public void delete(Long id) throws GiftCertificateServiceException, GiftCertificateNotFoundException {
         try {
+            this.getCertificateById(id);
             giftCertificateDAO.delete(id);
         } catch (DaoDeleteException e) {
             throw new GiftCertificateServiceException("Cannot delete certificate with id " + id, e);

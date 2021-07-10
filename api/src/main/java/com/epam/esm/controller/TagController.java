@@ -1,6 +1,7 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.TagNotFoundException;
 import com.epam.esm.exception.TagServiceException;
 import com.epam.esm.service.TagService;
 import org.apache.logging.log4j.LogManager;
@@ -33,9 +34,9 @@ public class TagController {
         return new ResponseEntity<>(tagService.getAllTags(), HttpStatus.OK);
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<Tag> findByName(@PathVariable String name) throws TagServiceException {
-        return new ResponseEntity<>(tagService.getTagByName(name), HttpStatus.OK);
+    @GetMapping("/{id}")
+    public ResponseEntity<Tag> findById(@PathVariable Long id) throws TagServiceException, TagNotFoundException {
+        return new ResponseEntity<>(tagService.getTagById(id), HttpStatus.OK);
     }
 
     @PostMapping
@@ -45,7 +46,8 @@ public class TagController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTag(@PathVariable Long id) throws TagServiceException {
+    public ResponseEntity<HttpStatus> deleteTag(@PathVariable Long id) throws TagServiceException, TagNotFoundException {
         tagService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
