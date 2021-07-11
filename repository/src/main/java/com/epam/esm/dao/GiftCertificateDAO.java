@@ -12,6 +12,8 @@ public interface GiftCertificateDAO {
 
     GiftCertificate getCertificateById(Long id);
 
+    GiftCertificate getCertificateByName(String name);
+
     GiftCertificate getCertificateByTagName(String tagName);
 
     GiftCertificate update(Long id, GiftCertificate newCertificate) throws DaoUpdateException;

@@ -1,8 +1,10 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.exception.GiftCertificateAlreadyExistsException;
 import com.epam.esm.exception.GiftCertificateNotFoundException;
 import com.epam.esm.exception.GiftCertificateServiceException;
+import com.epam.esm.exception.TagAlreadyExistsException;
 import com.epam.esm.service.GiftCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,7 +39,7 @@ public class GiftCertificateController {
 
     @PostMapping
     public ResponseEntity<GiftCertificate> createCertificate(@RequestBody GiftCertificate giftCertificate)
-            throws GiftCertificateServiceException {
+            throws GiftCertificateServiceException, TagAlreadyExistsException, GiftCertificateAlreadyExistsException {
         GiftCertificate newCertificate = giftCertificateService.create(giftCertificate);
         return new ResponseEntity<>(newCertificate, HttpStatus.CREATED);
     }
@@ -52,7 +54,8 @@ public class GiftCertificateController {
     @PatchMapping("/{id}")
     public ResponseEntity<GiftCertificate> updateCertificate(@PathVariable Long id,
                                                              @RequestBody GiftCertificate giftCertificate)
-            throws GiftCertificateServiceException, GiftCertificateNotFoundException {
+            throws GiftCertificateServiceException, GiftCertificateNotFoundException, TagAlreadyExistsException,
+                GiftCertificateAlreadyExistsException {
         GiftCertificate newCertificate = giftCertificateService.update(id, giftCertificate);
         return new ResponseEntity<>(newCertificate, HttpStatus.OK);
     }

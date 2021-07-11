@@ -1,6 +1,7 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.TagAlreadyExistsException;
 import com.epam.esm.exception.TagNotFoundException;
 import com.epam.esm.exception.TagServiceException;
 import com.epam.esm.service.TagService;
@@ -40,7 +41,7 @@ public class TagController {
     }
 
     @PostMapping
-    public ResponseEntity<Tag> createTag(@RequestBody Tag tag) throws TagServiceException {
+    public ResponseEntity<Tag> createTag(@RequestBody Tag tag) throws TagServiceException, TagAlreadyExistsException {
         Tag newTag = tagService.create(tag);
         return new ResponseEntity<>(newTag, HttpStatus.CREATED);
     }

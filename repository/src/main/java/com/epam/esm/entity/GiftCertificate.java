@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 public class GiftCertificate {
     private Long id;
@@ -14,6 +15,8 @@ public class GiftCertificate {
     private Integer duration;
     private LocalDateTime createDate;
     private LocalDateTime lastUpdateDate;
+
+    private Set<Tag> tags;
 
     public Integer getDuration() {
         return duration;
@@ -69,6 +72,14 @@ public class GiftCertificate {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
     }
 
     @Override
@@ -147,6 +158,11 @@ public class GiftCertificate {
 
         public Builder withLastUpdateDate(LocalDateTime lastUpdateDate){
             giftCertificate.lastUpdateDate = lastUpdateDate;
+            return this;
+        }
+
+        public Builder withTags(Set<Tag> tags){
+            giftCertificate.setTags(tags);
             return this;
         }
 

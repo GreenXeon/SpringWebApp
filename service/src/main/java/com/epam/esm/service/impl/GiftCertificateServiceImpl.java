@@ -1,17 +1,20 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.GiftCertificateDAO;
-import com.epam.esm.dao.impl.GiftCertificateDAOImpl;
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.*;
 import com.epam.esm.service.GiftCertificateService;
+import com.epam.esm.service.TagService;
 import com.epam.esm.util.ServiceUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
@@ -19,25 +22,52 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     private final GiftCertificateDAO giftCertificateDAO;
 
+    private final TagService tagService;
+
     @Autowired
-    public GiftCertificateServiceImpl(GiftCertificateDAO giftCertificateDAO) {
+    public GiftCertificateServiceImpl(GiftCertificateDAO giftCertificateDAO, TagService tagService) {
         this.giftCertificateDAO = giftCertificateDAO;
+        this.tagService = tagService;
     }
 
     @Override
-    public GiftCertificate create(GiftCertificate giftCertificate) throws GiftCertificateServiceException {
+    public GiftCertificate create(GiftCertificate giftCertificate)
+            throws GiftCertificateServiceException, TagAlreadyExistsException, GiftCertificateAlreadyExistsException {
         try {
+            if (giftCertificateDAO.getCertificateByName(giftCertificate.getName()) != null){
+                throw new GiftCertificateAlreadyExistsException("Certificate with name '" + giftCertificate.getName()
+                + "' already exists");
+            }
             giftCertificate.setCreateDate(ServiceUtils.getCurrentDateTime());
             giftCertificate.setLastUpdateDate(ServiceUtils.getCurrentDateTime());
-            return giftCertificateDAO.create(giftCertificate);
-        } catch (DaoCreateException e) {
-            throw new GiftCertificateServiceException("Creating certificate '" + giftCertificate.getName() + "' is failed", e);
+            GiftCertificate newCertificate = giftCertificateDAO.create(giftCertificate);
+            Set<Tag> tags = new HashSet<>(giftCertificate.getTags());
+            for (Tag tag : tags){
+                if (tagService.getTagByName(tag.getName()) == null){
+                    tagService.create(tag);
+                }
+                tag.setId(tagService.getTagByName(tag.getName()).getId());
+                tagService.saveCertificateTag(
+                        newCertificate.getId(),
+                        tagService.getTagByName(tag.getName()).getId());
+            }
+            newCertificate.setTags(tags);
+            return newCertificate;
+        } catch (DaoCreateException | TagServiceException e) {
+            throw new GiftCertificateServiceException("Creating certificate '" +
+                    giftCertificate.getName() + "' is failed", e);
         }
     }
 
     @Override
     public List<GiftCertificate> getAllCertificates() {
-        return giftCertificateDAO.getAllCertificates();
+        List<GiftCertificate> giftCertificates =  giftCertificateDAO.getAllCertificates();
+        giftCertificates.forEach(
+                giftCertificate -> giftCertificate.setTags(
+                      new HashSet<>(tagService.getTagsByCertificateId(giftCertificate.getId()))
+                )
+        );
+        return giftCertificates;
     }
 
     @Override
@@ -46,6 +76,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if (giftCertificate == null){
             throw new GiftCertificateNotFoundException("Certificate with id " + id + " is not found");
         }
+        Set<Tag> tagsOfCertificate = new HashSet<>(tagService.getTagsByCertificateId(id));
+        giftCertificate.setTags(tagsOfCertificate);
         return giftCertificate;
     }
 
@@ -60,8 +92,16 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public GiftCertificate update(Long id, GiftCertificate changingCertificate)
-            throws GiftCertificateServiceException, GiftCertificateNotFoundException {
+            throws GiftCertificateServiceException, GiftCertificateNotFoundException, TagAlreadyExistsException,
+                GiftCertificateAlreadyExistsException {
         try {
+            if (!giftCertificateDAO.getCertificateById(id).getName().equalsIgnoreCase(changingCertificate.getName())
+                && changingCertificate.getName() != null){
+                if (giftCertificateDAO.getCertificateByName(changingCertificate.getName()) != null){
+                    throw new GiftCertificateAlreadyExistsException("Certificate with name '" +
+                            changingCertificate.getName() + "' already exists");
+                }
+            }
             GiftCertificate newCertificate = new GiftCertificate();
             GiftCertificate oldCertificate = getCertificateById(id);
             newCertificate.setId(oldCertificate.getId());
@@ -76,8 +116,22 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             newCertificate.setCreateDate(changingCertificate.getCreateDate() == null ? oldCertificate.getCreateDate()
                     : changingCertificate.getCreateDate());
             newCertificate.setLastUpdateDate(ServiceUtils.getCurrentDateTime());
+
+            Set<Tag> newTags = changingCertificate.getTags();
+            if (newTags != null) {
+                tagService.deleteCertificateTag(id);
+                for (Tag tag : newTags) {
+                    if (tagService.getTagByName(tag.getName()) == null){
+                        tag = tagService.create(tag);
+                    } else {
+                        tag.setId(tagService.getTagByName(tag.getName()).getId());
+                    }
+                    tagService.saveCertificateTag(id, tag.getId());
+                }
+            }
+            newCertificate.setTags(newTags);
             return giftCertificateDAO.update(id, newCertificate);
-        } catch (DaoUpdateException e) {
+        } catch (DaoUpdateException | TagServiceException | DaoDeleteException | DaoCreateException e) {
             throw new GiftCertificateServiceException("Cannot update certificate with id " + id, e);
         }
     }

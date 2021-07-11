@@ -45,7 +45,7 @@ class GiftCertificateDAOImplTest {
     @Test
     void create() throws DaoCreateException {
         int oldSize = giftCertificateDAO.getAllCertificates().size();
-        assertDoesNotThrow(() -> giftCertificateDAO.create(giftCertificate));
+       giftCertificateDAO.create(giftCertificate);
         int newSize = giftCertificateDAO.getAllCertificates().size();
         assertEquals(newSize, oldSize + 1);
     }

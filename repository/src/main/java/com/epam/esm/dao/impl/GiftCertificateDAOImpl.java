@@ -3,9 +3,16 @@ package com.epam.esm.dao.impl;
 import com.epam.esm.dao.GiftCertificateDAO;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,6 +21,7 @@ import java.util.List;
 public class GiftCertificateDAOImpl implements GiftCertificateDAO {
     private static final String GET_ALL_CERTIFICATES = "SELECT * FROM springdb.gift_certificate";
     private static final String GET_CERTIFICATE_BY_ID = "SELECT * FROM springdb.gift_certificate WHERE id = ?";
+    private static final String GET_CERTIFICATE_BY_NAME = "SELECT * FROM springdb.gift_certificate WHERE name = ?";
     private static final String SAVE_CERTIFICATE = "INSERT INTO springdb.gift_certificate" +
             " (name, description, price, duration, create_date, last_update_date) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String DELETE_CERTIFICATE_BY_ID = "DELETE FROM springdb.gift_certificate WHERE id = ?";
@@ -22,6 +30,8 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
             "(SELECT id FROM springdb.tag WHERE name = ?))";
     private static final String UPDATE_CERTIFICATE = "UPDATE springdb.gift_certificate SET name = ?," +
             "description = ?, price = ?, duration = ?, create_date = ?, last_update_date = ? WHERE id = ?";
+
+    private final Logger logger = LogManager.getLogger(GiftCertificateDAOImpl.class);
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -32,16 +42,14 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
 
     @Override
     public GiftCertificate create(GiftCertificate giftCertificate) throws DaoCreateException {
-        if (jdbcTemplate.update(SAVE_CERTIFICATE,
-                giftCertificate.getName(),
-                giftCertificate.getDescription(),
-                giftCertificate.getPrice(),
-                giftCertificate.getDuration(),
-                giftCertificate.getCreateDate(),
-                giftCertificate.getLastUpdateDate()) == 0){
-            throw new DaoCreateException("Cannot create certificate with name " + giftCertificate.getName());
-        }
-            return giftCertificate;
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+        simpleJdbcInsert
+                .withTableName("gift_certificate")
+                .usingGeneratedKeyColumns("id");
+        Number id = simpleJdbcInsert.executeAndReturnKey(
+                new BeanPropertySqlParameterSource(giftCertificate));
+        giftCertificate.setId(id.longValue());
+        return giftCertificate;
     }
 
     @Override
@@ -53,6 +61,16 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
     public GiftCertificate getCertificateById(Long id) {
         GiftCertificate giftCertificate = jdbcTemplate.query(GET_CERTIFICATE_BY_ID,
                 new BeanPropertyRowMapper<>(GiftCertificate.class), id)
+                .stream()
+                .findAny()
+                .orElse(null);
+        return giftCertificate;
+    }
+
+    @Override
+    public GiftCertificate getCertificateByName(String name) {
+        GiftCertificate giftCertificate = jdbcTemplate.query(GET_CERTIFICATE_BY_NAME,
+                new BeanPropertyRowMapper<>(GiftCertificate.class), name)
                 .stream()
                 .findAny()
                 .orElse(null);

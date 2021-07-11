@@ -13,5 +13,13 @@ public interface TagDAO {
 
     Tag getTagById(Long id);
 
+    Tag getTagByName(String name);
+
+    void saveCertificateTag(Long certificateId, Long tagId) throws DaoCreateException;
+
+    void deleteCertificateTag(Long certificateId) throws DaoDeleteException;
+
     void delete(Long id) throws DaoDeleteException;
+
+    List<Tag> getTagsByCertificateId(Long id);
 }

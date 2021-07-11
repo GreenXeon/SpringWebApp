@@ -42,7 +42,9 @@ class GiftCertificateServiceImplTest {
     }
 
     @Test
-    void whenMockCreatesCertificateThenReturnCertificate() throws DaoCreateException, GiftCertificateServiceException {
+    void whenMockCreatesCertificateThenReturnCertificate()
+            throws DaoCreateException, GiftCertificateServiceException,
+            TagAlreadyExistsException, GiftCertificateAlreadyExistsException {
         GiftCertificate giftCertificate = getTestCertificate();
         when(giftCertificateDAO.create(giftCertificate)).thenReturn(giftCertificate);
         GiftCertificate newCertificate = giftCertificateService.create(giftCertificate);
@@ -74,7 +76,8 @@ class GiftCertificateServiceImplTest {
 
     @Test
     void whenMockUpdatesCertificateThenReturnNewCertificate()
-            throws DaoUpdateException, GiftCertificateNotFoundException, GiftCertificateServiceException {
+            throws DaoUpdateException, GiftCertificateNotFoundException, GiftCertificateServiceException,
+            TagAlreadyExistsException, GiftCertificateAlreadyExistsException {
         GiftCertificate newCertificate = getTestCertificate();
         GiftCertificate oldCertificate = getTestCertificate();
         oldCertificate.setName(null);

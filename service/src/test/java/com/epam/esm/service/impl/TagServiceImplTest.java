@@ -2,10 +2,7 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.TagDAO;
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.DaoCreateException;
-import com.epam.esm.exception.DaoDeleteException;
-import com.epam.esm.exception.TagNotFoundException;
-import com.epam.esm.exception.TagServiceException;
+import com.epam.esm.exception.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,9 +12,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,7 +26,8 @@ class TagServiceImplTest {
     private TagServiceImpl tagService;
 
     @Test
-    public void whenMockCreatesTagThenReturnTag() throws DaoCreateException, TagServiceException {
+    public void whenMockCreatesTagThenReturnTag()
+            throws DaoCreateException, TagServiceException, TagAlreadyExistsException {
         Tag tag = new Tag.Builder()
                 .withId(1L)
                 .withName("SampleName")
@@ -56,7 +54,8 @@ class TagServiceImplTest {
     @Test
     public void whenMockDeletesTagThenReturnTrue() throws DaoDeleteException, TagServiceException, TagNotFoundException {
         doNothing().when(tagDAO).delete(anyLong());
-        tagService.delete(1L);
+        when(tagDAO.getTagById(anyLong())).thenReturn(new Tag());
+        tagService.delete(17L);
         verify(tagDAO).delete(anyLong());
     }
 }

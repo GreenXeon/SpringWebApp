@@ -1,12 +1,8 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.TagDAO;
-import com.epam.esm.dao.impl.TagDAOImpl;
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.DaoCreateException;
-import com.epam.esm.exception.DaoDeleteException;
-import com.epam.esm.exception.TagNotFoundException;
-import com.epam.esm.exception.TagServiceException;
+import com.epam.esm.exception.*;
 import com.epam.esm.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,8 +19,11 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Tag create(Tag tag) throws TagServiceException {
+    public Tag create(Tag tag) throws TagServiceException, TagAlreadyExistsException {
         try {
+            if (getTagByName(tag.getName()) != null){
+                throw new TagAlreadyExistsException("Tag with name '" + tag.getName() + "' already exists");
+            }
             return tagDAO.create(tag);
         } catch (DaoCreateException e) {
             throw new TagServiceException("Creating tag " + tag.getName() + " service error", e);
@@ -46,6 +45,21 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    public Tag getTagByName(String name) {
+        return tagDAO.getTagByName(name);
+    }
+
+    @Override
+    public void saveCertificateTag(Long certificateId, Long tagId) throws DaoCreateException {
+        tagDAO.saveCertificateTag(certificateId, tagId);
+    }
+
+    @Override
+    public void deleteCertificateTag(Long certificateId) throws DaoDeleteException {
+        tagDAO.deleteCertificateTag(certificateId);
+    }
+
+    @Override
     public void delete(Long id) throws TagServiceException, TagNotFoundException {
         try {
             getTagById(id);
@@ -53,5 +67,10 @@ public class TagServiceImpl implements TagService {
         } catch (DaoDeleteException e) {
             throw new TagServiceException("Deleting tag " + id + " service error", e);
         }
+    }
+
+    @Override
+    public List<Tag> getTagsByCertificateId(Long id) {
+        return tagDAO.getTagsByCertificateId(id);
     }
 }
