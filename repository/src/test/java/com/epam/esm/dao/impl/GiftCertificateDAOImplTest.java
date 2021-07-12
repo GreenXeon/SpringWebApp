@@ -14,6 +14,8 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -82,5 +84,15 @@ class GiftCertificateDAOImplTest {
         long fakeId = 1000L;
         assertDoesNotThrow(() -> giftCertificateDAO.getCertificateById(realId));
         assertEquals(giftCertificateDAO.getCertificateById(realId).getName(), "first");
+    }
+
+    @Test
+    void getAllCertificatesByQuery() {
+        Map<String, String > params = new HashMap<>();
+        params.put("name", "mjc");
+        params.put("order", "asc");
+        int size = giftCertificateDAO.getAllCertificatesByQuery(params).size();
+        System.out.println(giftCertificateDAO.getAllCertificatesByQuery(params));
+        assertEquals(size, 1);
     }
 }

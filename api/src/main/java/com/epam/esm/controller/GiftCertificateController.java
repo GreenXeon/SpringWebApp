@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @EnableWebMvc
@@ -26,8 +28,14 @@ public class GiftCertificateController {
     }
 
     @GetMapping
-    public ResponseEntity<List<GiftCertificate>> showAllCertificates(){
-        return new ResponseEntity<>(giftCertificateService.getAllCertificates(), HttpStatus.OK);
+    public ResponseEntity<List<GiftCertificate>> showAllCertificates(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String order)
+    {
+        Map<String, String> queryParams = new HashMap<>();
+        queryParams.computeIfAbsent("name", val -> name);
+        queryParams.computeIfAbsent("order", val -> order);
+        return new ResponseEntity<>(giftCertificateService.getAllCertificatesByQuery(queryParams), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

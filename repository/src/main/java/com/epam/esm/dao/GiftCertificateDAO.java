@@ -4,6 +4,7 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.*;
 
 import java.util.List;
+import java.util.Map;
 
 public interface GiftCertificateDAO {
     GiftCertificate create(GiftCertificate giftCertificate) throws DaoCreateException;
@@ -15,6 +16,8 @@ public interface GiftCertificateDAO {
     GiftCertificate getCertificateByName(String name);
 
     GiftCertificate getCertificateByTagName(String tagName);
+
+    List<GiftCertificate> getAllCertificatesByQuery(Map<String, String> params);
 
     GiftCertificate update(Long id, GiftCertificate newCertificate) throws DaoUpdateException;
 

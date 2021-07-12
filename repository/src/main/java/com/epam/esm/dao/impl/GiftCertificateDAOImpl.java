@@ -16,6 +16,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class GiftCertificateDAOImpl implements GiftCertificateDAO {
@@ -30,6 +31,11 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
             "(SELECT id FROM springdb.tag WHERE name = ?))";
     private static final String UPDATE_CERTIFICATE = "UPDATE springdb.gift_certificate SET name = ?," +
             "description = ?, price = ?, duration = ?, create_date = ?, last_update_date = ? WHERE id = ?";
+    private static final String GET_ALL_CERTIFICATES_QUERY = "SELECT gc.id,gc.name,gc.description, gc.price," +
+            " gc.duration, gc.create_date, gc.last_update_date" +
+            "    FROM springdb.gift_certificate gc" +
+            "        JOIN springdb.gift_certificate_has_tag ct on gc.id = ct.gift_certificate_id" +
+            "        JOIN springdb.tag t on t.id = ct.tag_id";
 
     private final Logger logger = LogManager.getLogger(GiftCertificateDAOImpl.class);
 
@@ -85,6 +91,24 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
                 .findAny()
                 .orElse(null);
         return giftCertificate;
+    }
+
+    @Override
+    public List<GiftCertificate> getAllCertificatesByQuery(Map<String, String> params) {
+        StringBuilder sql = new StringBuilder(GET_ALL_CERTIFICATES_QUERY);
+        if (params.containsKey("name")) {
+            sql.append(" WHERE t.name = '")
+                    .append(params.get("name")).append("'")
+                    .append(" OR gc.name like '%")
+                    .append(params.get("name")).append("%'")
+                    .append(" OR gc.description like '%")
+                    .append(params.get("name")).append("%'");
+        }
+        sql.append(" GROUP BY gc.id ORDER BY gc.name ");
+        if (params.containsKey("order")) {
+            sql.append(" ").append(params.get("order"));
+        }
+        return jdbcTemplate.query(sql.toString(), new BeanPropertyRowMapper<>(GiftCertificate.class));
     }
 
     @Override

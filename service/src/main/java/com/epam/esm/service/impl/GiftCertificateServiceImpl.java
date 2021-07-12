@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -88,6 +89,17 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             throw new GiftCertificateNotFoundException("Certificate with tag name '" + tagName + "' is not found");
         }
         return giftCertificate;
+    }
+
+    @Override
+    public List<GiftCertificate> getAllCertificatesByQuery(Map<String, String> params) {
+        List<GiftCertificate> giftCertificates = giftCertificateDAO.getAllCertificatesByQuery(params);
+        giftCertificates.forEach(
+                giftCertificate -> giftCertificate.setTags(
+                        new HashSet<>(tagService.getTagsByCertificateId(giftCertificate.getId()))
+                )
+        );
+        return giftCertificates;
     }
 
     @Override
