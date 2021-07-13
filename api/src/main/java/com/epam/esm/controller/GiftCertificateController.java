@@ -16,6 +16,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ * Class represents user API for operations with certificates
+ * @author Zakhar Shyshkin
+ * @since 1.0
+ *
+ */
+
 @RestController
 @EnableWebMvc
 @RequestMapping(value = "/certificate")
@@ -26,6 +34,14 @@ public class GiftCertificateController {
     public GiftCertificateController(GiftCertificateService giftCertificateService) {
         this.giftCertificateService = giftCertificateService;
     }
+
+    /**
+     * Shows all certificates with tags
+     *
+     * @param name name of tag, part of description or part of certificate name
+     * @param order asc/desc
+     * @return response entity with list of found tags
+     */
 
     @GetMapping
     public ResponseEntity<List<GiftCertificate>> showAllCertificates(
@@ -38,12 +54,33 @@ public class GiftCertificateController {
         return new ResponseEntity<>(giftCertificateService.getAllCertificatesByQuery(queryParams), HttpStatus.OK);
     }
 
+    /**
+     * Shows certificate with certain id
+     *
+     * @param id tag id
+     * @return response entity with found certificate and OK HTTP status
+     *
+     * @throws GiftCertificateServiceException if error occurred during service processes
+     * @throws GiftCertificateNotFoundException if certificate with given id was not found
+     */
+
     @GetMapping("/{id}")
     public ResponseEntity<GiftCertificate> showCertificateById(@PathVariable Long id)
             throws GiftCertificateServiceException, GiftCertificateNotFoundException {
         GiftCertificate giftCertificate = giftCertificateService.getCertificateById(id);
         return new ResponseEntity<>(giftCertificate, HttpStatus.OK);
     }
+
+    /**
+     * Creates certificate, taken from request body
+     *
+     * @param giftCertificate certificate for creating
+     * @return response entity with created certificate and CREATED HTTP status
+     *
+     * @throws GiftCertificateServiceException if error occurred during service processes
+     * @throws TagAlreadyExistsException if tag with given name already exists
+     * @throws GiftCertificateAlreadyExistsException if certificate with given name already exists
+     */
 
     @PostMapping
     public ResponseEntity<GiftCertificate> createCertificate(@RequestBody GiftCertificate giftCertificate)
@@ -52,12 +89,35 @@ public class GiftCertificateController {
         return new ResponseEntity<>(newCertificate, HttpStatus.CREATED);
     }
 
+    /**
+     * Deletes certificate with certain id
+     *
+     * @param id certificate id
+     * @return response entity with NO_CONTENT HTTP status
+     *
+     * @throws GiftCertificateServiceException if error occurred during service processes
+     * @throws GiftCertificateNotFoundException if certificate with given id was not found
+     */
+
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteCertificate(@PathVariable Long id)
             throws GiftCertificateServiceException, GiftCertificateNotFoundException {
         giftCertificateService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    /**
+     * Updates certificate with certain id
+     *
+     * @param id certificate id
+     * @param giftCertificate entity with fields for updating
+     * @return response entity with updated certificate and OK HTTP status
+     *
+     * @throws GiftCertificateServiceException if error occurred during service processes
+     * @throws GiftCertificateNotFoundException if certificate with given id was not found
+     * @throws TagAlreadyExistsException if tag with given name already exists
+     * @throws GiftCertificateAlreadyExistsException if certificate with given name already exists
+     */
 
     @PatchMapping("/{id}")
     public ResponseEntity<GiftCertificate> updateCertificate(@PathVariable Long id,
