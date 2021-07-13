@@ -54,13 +54,4 @@ class TagDAOImplTest {
         assertDoesNotThrow(() -> tagDAO.delete(1L));
         assertEquals(tagDAO.getAllTags().size(), 2);
     }
-
-    @Test
-    @Order(4)
-    void create(){
-        int oldSize = tagDAO.getAllTags().size();
-        assertDoesNotThrow(() -> tagDAO.create(tag));
-        int newSize = tagDAO.getAllTags().size();
-        assertEquals(newSize, ++oldSize);
-    }
 }

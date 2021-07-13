@@ -5,6 +5,7 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.*;
 import com.epam.esm.service.GiftCertificateService;
+import com.epam.esm.service.TagService;
 import com.epam.esm.util.ServiceUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,9 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -27,10 +26,18 @@ class GiftCertificateServiceImplTest {
     @Mock
     private GiftCertificateDAO giftCertificateDAO;
 
+    @Mock
+    private TagService tagService;
+
     @InjectMocks
     private GiftCertificateServiceImpl giftCertificateService;
 
     private GiftCertificate getTestCertificate(){
+        Set<Tag> tagSet = new HashSet<>();
+        Tag tag = new Tag.Builder()
+                .withName("sample")
+                .build();
+        tagSet.add(tag);
         return new GiftCertificate.Builder()
                 .withName("New")
                 .withDescription("Sample description")
@@ -38,6 +45,7 @@ class GiftCertificateServiceImplTest {
                 .withDuration(4)
                 .withCreateDate(ServiceUtils.getCurrentDateTime())
                 .withLastUpdateDate(ServiceUtils.getCurrentDateTime())
+                .withTags(tagSet)
                 .build();
     }
 
@@ -47,6 +55,8 @@ class GiftCertificateServiceImplTest {
             TagAlreadyExistsException, GiftCertificateAlreadyExistsException {
         GiftCertificate giftCertificate = getTestCertificate();
         when(giftCertificateDAO.create(giftCertificate)).thenReturn(giftCertificate);
+        when(tagService.getTagByName(anyString())).thenReturn(new Tag());
+        lenient().doNothing().when(tagService).saveCertificateTag(anyLong(), anyLong());
         GiftCertificate newCertificate = giftCertificateService.create(giftCertificate);
         assertEquals(newCertificate.getDuration(), 4);
     }
@@ -77,13 +87,15 @@ class GiftCertificateServiceImplTest {
     @Test
     void whenMockUpdatesCertificateThenReturnNewCertificate()
             throws DaoUpdateException, GiftCertificateNotFoundException, GiftCertificateServiceException,
-            TagAlreadyExistsException, GiftCertificateAlreadyExistsException {
+            TagAlreadyExistsException, GiftCertificateAlreadyExistsException, DaoCreateException {
         GiftCertificate newCertificate = getTestCertificate();
         GiftCertificate oldCertificate = getTestCertificate();
-        oldCertificate.setName(null);
+        oldCertificate.setName("Old");
         newCertificate.setName("New");
         doReturn(newCertificate).when(giftCertificateDAO).update(1L, newCertificate);
-        doReturn(oldCertificate).when(giftCertificateDAO).getCertificateById(1L);
+        doReturn(oldCertificate).when(giftCertificateDAO).getCertificateById(anyLong());
+        when(tagService.getTagByName(anyString())).thenReturn(new Tag());
+        lenient().doNothing().when(tagService).saveCertificateTag(anyLong(), anyLong());
         GiftCertificate giftCertificate = giftCertificateService.update(1L, newCertificate);
         assertEquals(giftCertificate.getName(), "New");
     }
@@ -92,6 +104,7 @@ class GiftCertificateServiceImplTest {
     void whenMockDeletesTagThenReturnTrue() throws
             DaoDeleteException, GiftCertificateServiceException, GiftCertificateNotFoundException {
         doNothing().when(giftCertificateDAO).delete(anyLong());
+        when(giftCertificateDAO.getCertificateById(anyLong())).thenReturn(new GiftCertificate());
         giftCertificateService.delete(1L);
         verify(giftCertificateDAO).delete(1L);
     }

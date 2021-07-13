@@ -140,6 +140,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                     }
                     tagService.saveCertificateTag(id, tag.getId());
                 }
+            } else {
+                newTags = new HashSet<>(tagService.getTagsByCertificateId(id));
             }
             newCertificate.setTags(newTags);
             return giftCertificateDAO.update(id, newCertificate);
